@@ -8,6 +8,14 @@ import scipy.signal as sps
 from scipy.linalg import norm
 import argparse
 
+def compute_mae(reference, test):
+    mae = np.mean(np.abs(reference - test))
+    return mae
+
+def compute_mse(reference, test):
+    mse = np.mean((reference - test) ** 2)
+    return mse
+
 def load_wav(file_path, target_sr=None):
     wav, sr = librosa.load(file_path, sr=target_sr)
     return wav, sr
@@ -58,14 +66,6 @@ def compute_isd(reference, test):
     test_spectrum = np.abs(librosa.stft(test))
     isd = np.mean((ref_spectrum - test_spectrum) ** 2 / (ref_spectrum * test_spectrum))
     return isd
-
-def compute_mae(reference, test):
-    mae = np.mean(np.abs(reference - test))
-    return mae
-
-def compute_mse(reference, test):
-    mse = np.mean((reference - test) ** 2)
-    return mse
 
 def main(reference_path, test_paths):
     target_sr = 16000
