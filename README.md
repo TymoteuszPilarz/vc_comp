@@ -12,5 +12,5 @@ This project aims to compare the quality of various voice cloning models using f
 # Usage
 ```vc_comp.py [-h] reference test [test ...]```
 
-- reference   Path to the reference .wav file
-- test        Paths to the test .wav files
+- ```reference```   Path to the reference .wav file
+- ```test```        Paths to the test .wav files
