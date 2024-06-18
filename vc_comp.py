@@ -77,25 +77,25 @@ def main(reference_path, test_paths):
         
         reference_trimmed, test_trimmed = trim_to_shortest(reference, test)
         
+        mae = compute_mae(reference_trimmed, test_trimmed)
+        mse = compute_mse(reference_trimmed, test_trimmed)
         snr = compute_snr(reference_trimmed, test_trimmed)
         pesq_score = compute_pesq(reference_trimmed, sr_ref, test_trimmed, sr_test)
         stoi_score = compute_stoi(reference_trimmed, sr_ref, test_trimmed, sr_test)
         llr = compute_llr(reference_trimmed, test_trimmed, sr_ref)
         cd = compute_cepstral_distance(reference_trimmed, test_trimmed, sr_ref)
         isd = compute_isd(reference_trimmed, test_trimmed)
-        mae = compute_mae(reference_trimmed, test_trimmed)
-        mse = compute_mse(reference_trimmed, test_trimmed)
         
         results.append({
+            'MAE': mae,
+            'MSE': mse,
             'file': test_path,
             'SNR': snr,
             'PESQ': pesq_score,
             'STOI': stoi_score,
             'LLR': llr,
             'CD': cd,
-            'ISD': isd,
-            'MAE': mae,
-            'MSE': mse
+            'ISD': isd
         })
 
     return results
