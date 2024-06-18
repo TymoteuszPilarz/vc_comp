@@ -1,5 +1,5 @@
 # Voice cloning models comparison
-This project aims to compare the quality of various voice cloning models using following metrics:
+This project aims to compare the quality of various voice cloning models using the following metrics:
 - SNR (Signal-to-Noise Ratio)
 - PESQ (Perceptual Evaluation of Speech Quality)
 - STOI (Short-Time Objective Intelligibility)
