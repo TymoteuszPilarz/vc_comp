@@ -87,9 +87,9 @@ def main(reference_path, test_paths):
         isd = compute_isd(reference_trimmed, test_trimmed)
         
         results.append({
+            'file': test_path,
             'MAE': mae,
             'MSE': mse,
-            'file': test_path,
             'SNR': snr,
             'PESQ': pesq_score,
             'STOI': stoi_score,
