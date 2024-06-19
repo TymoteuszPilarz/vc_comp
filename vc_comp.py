@@ -8,14 +8,6 @@ import scipy.signal as sps
 from scipy.linalg import norm
 import argparse
 
-def compute_mae(reference, test):
-    mae = np.mean(np.abs(reference - test))
-    return mae
-
-def compute_mse(reference, test):
-    mse = np.mean((reference - test) ** 2)
-    return mse
-
 def load_wav(file_path, target_sr=None):
     wav, sr = librosa.load(file_path, sr=target_sr)
     return wav, sr
@@ -28,6 +20,14 @@ def resample_if_necessary(wav, original_sr, target_sr=16000):
 def trim_to_shortest(reference, test):
     min_len = min(len(reference), len(test))
     return reference[:min_len], test[:min_len]
+
+def compute_mae(reference, test):
+    mae = np.mean(np.abs(reference - test))
+    return mae
+
+def compute_mse(reference, test):
+    mse = np.mean((reference - test) ** 2)
+    return mse
 
 def compute_snr(reference, test):
     noise = reference - test
