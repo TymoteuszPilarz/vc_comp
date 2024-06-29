@@ -67,48 +67,57 @@ def compute_isd(reference, test):
     isd = np.mean((ref_spectrum - test_spectrum) ** 2 / (ref_spectrum * test_spectrum))
     return isd
 
-def main(reference_path, test_paths):
+def evaluate_model(reference_paths, test_paths):
     target_sr = 16000
-    reference, sr_ref = load_wav(reference_path, target_sr=target_sr)
-    results = []
+    metrics = {
+        'MAE': [],
+        'MSE': [],
+        'SNR': [],
+        'PESQ': [],
+        'STOI': [],
+        'LLR': [],
+        'CD': [],
+        'ISD': []
+    }
 
-    for test_path in test_paths:
+    for ref_path, test_path in zip(reference_paths, test_paths):
+        reference, sr_ref = load_wav(ref_path, target_sr=target_sr)
         test, sr_test = load_wav(test_path, target_sr=target_sr)
         
         reference_trimmed, test_trimmed = trim_to_shortest(reference, test)
         
-        mae = compute_mae(reference_trimmed, test_trimmed)
-        mse = compute_mse(reference_trimmed, test_trimmed)
-        snr = compute_snr(reference_trimmed, test_trimmed)
-        pesq_score = compute_pesq(reference_trimmed, sr_ref, test_trimmed, sr_test)
-        stoi_score = compute_stoi(reference_trimmed, sr_ref, test_trimmed, sr_test)
-        llr = compute_llr(reference_trimmed, test_trimmed, sr_ref)
-        cd = compute_cepstral_distance(reference_trimmed, test_trimmed, sr_ref)
-        isd = compute_isd(reference_trimmed, test_trimmed)
-        
-        results.append({
-            'file': test_path,
-            'MAE': mae,
-            'MSE': mse,
-            'SNR': snr,
-            'PESQ': pesq_score,
-            'STOI': stoi_score,
-            'LLR': llr,
-            'CD': cd,
-            'ISD': isd
-        })
+        metrics['MAE'].append(compute_mae(reference_trimmed, test_trimmed))
+        metrics['MSE'].append(compute_mse(reference_trimmed, test_trimmed))
+        metrics['SNR'].append(compute_snr(reference_trimmed, test_trimmed))
+        metrics['PESQ'].append(compute_pesq(reference_trimmed, sr_ref, test_trimmed, sr_test))
+        metrics['STOI'].append(compute_stoi(reference_trimmed, sr_ref, test_trimmed, sr_test))
+        metrics['LLR'].append(compute_llr(reference_trimmed, test_trimmed, sr_ref))
+        metrics['CD'].append(compute_cepstral_distance(reference_trimmed, test_trimmed, sr_ref))
+        metrics['ISD'].append(compute_isd(reference_trimmed, test_trimmed))
+    
+    average_metrics = {key: np.nanmean(value) for key, value in metrics.items()}
+    return average_metrics
 
+def main(reference_paths, test_paths):
+    model_names = set(path.split('_')[0] for path in test_paths)
+    results = {}
+    for model in model_names:
+        model_test_paths = [path for path in test_paths if path.startswith(model)]
+        results[model] = evaluate_model(reference_paths, model_test_paths)
     return results
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Evaluate the quality of voice cloning models.')
-    parser.add_argument('reference', type=str, help='Path to the reference .wav file')
+    parser.add_argument('reference', type=str, nargs=5, help='Paths to the reference .wav files')
     parser.add_argument('test', type=str, nargs='+', help='Paths to the test .wav files')
 
     args = parser.parse_args()
-    reference_path = args.reference
+    reference_paths = args.reference
     test_paths = args.test
 
-    results = main(reference_path, test_paths)
-    for result in results:
-        print(result)
+    results = main(reference_paths, test_paths)
+    for model, result in results.items():
+        print(f"Results for model {model}:")
+        for metric, value in result.items():
+            print(f"{metric}: {value}")
+        print()
